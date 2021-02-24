@@ -1,0 +1,18 @@
+{
+  "name": "zoom-chat-api",
+  "version": "1.0.0",
+  "description": "ZOOM CHAT APP with Pure Node Js + Socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "Patrick NAYITURIKI",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^2.0.7",
+    "pg": "^8.5.1"
+  }
+}

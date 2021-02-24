@@ -1,0 +1,7 @@
+{
+    "user": "postgres",
+    "host": "localhost",
+    "database": "zoom_db",
+    "password": "12354",
+    "port": 5432
+}
