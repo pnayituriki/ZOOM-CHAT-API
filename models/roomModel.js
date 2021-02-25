@@ -6,7 +6,6 @@ const addRoom = (user_id, room_key) => {
         pool
             .query(sql)
             .then((res) => {
-                console.log('room created', res)
                 const data = {
                     room_key: room_key
                 }

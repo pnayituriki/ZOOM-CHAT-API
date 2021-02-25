@@ -19,9 +19,16 @@ const getRooms = async (req, res, user_id) => {
 }
 
 const createRoom = async (req, res) => {
-    let body = [];
     try {
-        const userId = req.headers['authorization'].split('Bearer ')[1];
+        if (req.headers['authorization'] === undefined) {
+            res.statusCode = 401;
+            res.setHeader('Content-Type', 'application/json');
+            res.write(JSON.stringify({
+                message: 'Unauthorized Access!'
+            }));
+            return res.end();
+        }
+        const userId = parseInt(req.headers['authorization'].split('Bearer ')[1]);
         console.log("header..", userId);
         const roomId = randomid();
 
