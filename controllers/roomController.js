@@ -1,4 +1,5 @@
 const Room = require('../models/roomModel');
+const User = require('../models/userModel');
 const { randomid } = require('../helpers/functions');
 
 const getRooms = async (req, res, user_id) => {
@@ -29,7 +30,17 @@ const createRoom = async (req, res) => {
             return res.end();
         }
         const userId = parseInt(req.headers['authorization'].split('Bearer ')[1]);
+        const check_id = await User.isUserIdExist(userId);
+        console.log('check..', check_id);
         console.log("header..", userId);
+        if (!check_id) {
+            res.statusCode = 403;
+            res.setHeader('Content-Type', 'application/json');
+            res.write(JSON.stringify({
+                message: "user doesn't exist"
+            }));
+            return res.end();
+        }
         const roomId = randomid();
 
         const result = await Room.addRoom(userId, roomId);

@@ -36,4 +36,24 @@ const query = (text) => {
     });
 }
 
-module.exports = { loginUser, query };
+const isUserIdExist = (user_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM tbl_user WHERE user_id = ${user_id}`;
+        pool
+            .query(sql)
+            .then((res) => {
+                const data = res.rowCount > 0 ? true : false;
+                resolve(data);
+            })
+            .catch((err) => {
+                console.log(err)
+                reject(err);
+            });
+    })
+}
+
+module.exports = {
+    loginUser,
+    query,
+    isUserIdExist
+};
