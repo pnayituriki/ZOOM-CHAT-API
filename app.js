@@ -1,6 +1,6 @@
 const http = require('http');
 const url = require('url');
-const { authUser, allUser } = require('./controllers/userController');
+const { authUser, createUser } = require('./controllers/userController');
 const { getRooms, createRoom } = require('./controllers/roomController');
 const PORT = process.env.PORT || 5000;
 
@@ -16,29 +16,41 @@ const server = http.createServer((req, res) => {
     let method = req.method.toLowerCase();
 
     if (method === 'get') {
-        if (path === '/api/rooms') {
-            allUser(req, res);
-        } else if (path.match(/\/api\/rooms\/([0-9]+)/)) {
-            const user_id = path.split('/')[3];
-            console.log('uid:', user_id);
-            getRooms(req, res, user_id);
-            // res.setHeader("Content-Type", "application/json");
-            // res.setHeader("Access-Control-Allow-Origin", "*");
-            // res.writeHead(200);
-            // res.write(JSON.stringify({ message: 'Route for Chat GET' }));
-            // res.end();
-        } else {
-            res.setHeader("Content-Type", "application/json");
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.writeHead(404);
-            res.write(JSON.stringify({ message: 'Route not found GET' }));
-            res.end();
+        // if (path === '/api/rooms') {
+        //     allUser(req, res);
+        // } else if (path.match(/\/api\/rooms\/([0-9]+)/)) {
+        //     const user_id = path.split('/')[3];
+        //     console.log('uid:', user_id);
+        //     getRooms(req, res, user_id);
+        //     // res.setHeader("Content-Type", "application/json");
+        //     // res.setHeader("Access-Control-Allow-Origin", "*");
+        //     // res.writeHead(200);
+        //     // res.write(JSON.stringify({ message: 'Route for Chat GET' }));
+        //     // res.end();
+        // } else {
+        //     res.setHeader("Content-Type", "application/json");
+        //     res.setHeader("Access-Control-Allow-Origin", "*");
+        //     res.writeHead(404);
+        //     res.write(JSON.stringify({ message: 'Route not found GET' }));
+        //     res.end();
+        // }
+        switch (path) {
+            case '/api/rooms':
+                getRooms(req, res);
+                break;
+            default:
+                res.setHeader("Content-Type", "application/json");
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.writeHead(404);
+                res.write(JSON.stringify({ message: 'Route not found GET' }));
+                res.end();
+                break;
         }
 
     } else if (method == 'post') {
         switch (path) {
             case '/api/create-user':
-                authUser(req, res);
+                createUser(req, res);
                 // console.log('Body: ' + body)
 
                 // res.setHeader("Content-Type", "application/json");

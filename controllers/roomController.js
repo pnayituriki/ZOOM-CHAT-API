@@ -1,10 +1,27 @@
 const Room = require('../models/roomModel');
-const User = require('../models/userModel');
-const { randomid } = require('../helpers/functions');
+const { randomid, tokenVerify } = require('../helpers/functions');
 
-const getRooms = async (req, res, user_id) => {
+const getRooms = async (req, res) => {
     try {
-        const rooms = await Room.readMyRooms(user_id);
+        const verifiedToken = await tokenVerify(req);
+        console.log('______', verifiedToken);
+        if (verifiedToken === "unauthorized") {
+            res.statusCode = 401;
+            res.setHeader('Content-Type', 'application/json');
+            res.write(JSON.stringify({
+                message: 'Unauthorized Access!'
+            }));
+            return res.end();
+        } else if (verifiedToken === "forbidden") {
+            res.statusCode = 403;
+            res.setHeader('Content-Type', 'application/json');
+            res.write(JSON.stringify({
+                message: "user doesn't exist"
+            }));
+            return res.end();
+        }
+
+        const rooms = await Room.readMyRooms(verifiedToken);
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.writeHead(200);
@@ -21,19 +38,15 @@ const getRooms = async (req, res, user_id) => {
 
 const createRoom = async (req, res) => {
     try {
-        if (req.headers['authorization'] === undefined) {
+        const verifiedToken = await tokenVerify(req);
+        if (verifiedToken === "unauthorized") {
             res.statusCode = 401;
             res.setHeader('Content-Type', 'application/json');
             res.write(JSON.stringify({
                 message: 'Unauthorized Access!'
             }));
             return res.end();
-        }
-        const userId = parseInt(req.headers['authorization'].split('Bearer ')[1]);
-        const check_id = await User.isUserIdExist(userId);
-        console.log('check..', check_id);
-        console.log("header..", userId);
-        if (!check_id) {
+        } else if (verifiedToken === "forbidden") {
             res.statusCode = 403;
             res.setHeader('Content-Type', 'application/json');
             res.write(JSON.stringify({
@@ -41,9 +54,10 @@ const createRoom = async (req, res) => {
             }));
             return res.end();
         }
+
         const roomId = randomid();
 
-        const result = await Room.addRoom(userId, roomId);
+        const result = await Room.addRoom(verifiedToken, roomId);
 
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -52,20 +66,6 @@ const createRoom = async (req, res) => {
             data: result
         }));
         res.end();
-
-        // req.on('error', (err) => {
-        //     console.error(err);
-        // }).on('data', async function (data) {
-        //     await body.push(data);
-        // }).on('end', async function () {
-        //     body = await Buffer.concat(body).toString();
-        //     body = JSON.parse(body);
-        //     res.on('error', (err) => {
-        //         console.error(err);
-        //     });
-
-
-        // });
     } catch (error) {
         console.error(error);
         res.end();

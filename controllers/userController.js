@@ -1,5 +1,42 @@
 const User = require('../models/userModel');
 
+const createUser = async (req, res) => {
+    let body = [];
+    try {
+        req.on('error', (err) => {
+            console.error(err);
+        }).on('data', async function (data) {
+            await body.push(data);
+        }).on('end', async function () {
+            body = await Buffer.concat(body).toString();
+            body = JSON.parse(body);
+            res.on('error', (err) => {
+                console.error(err);
+            });
+
+            const result = await User.addUser(body.names, body.email, body.password);
+
+            if (result.error) {
+                res.statusCode = 409;
+                res.setHeader('Content-Type', 'application/json');
+                res.write(JSON.stringify({
+                    message: 'Email used by another person'
+                }));
+                return res.end();
+            }
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.write(JSON.stringify({
+                message: 'User Account Created'
+            }));
+            res.end();
+        });
+    } catch (error) {
+        console.error(error);
+        res.end();
+    }
+}
+
 const authUser = async (req, res) => {
     let body = [];
     try {
@@ -14,14 +51,26 @@ const authUser = async (req, res) => {
                 console.error(err);
             });
 
+            const result = await User.loginUser(body.email, body.password);
 
-            const result = await User.loginUser(body.username, body.password);
+            if (result.rowCount === 0) {
+                res.statusCode = 403;
+                res.setHeader('Content-Type', 'application/json');
+                res.write(JSON.stringify({
+                    message: 'Email or Password incorect',
+                    data: result
+                }));
+                return res.end();
+            }
 
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.write(JSON.stringify({
                 message: 'User Authentication',
-                data: result
+                data: {
+                    ...result,
+                    token: result.data[0].user_id
+                }
             }));
             res.end();
         });
@@ -49,5 +98,6 @@ const allUser = async (req, res) => {
 
 module.exports = {
     authUser,
-    allUser
+    allUser,
+    createUser
 };
