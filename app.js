@@ -1,7 +1,7 @@
 const http = require('http');
 const url = require('url');
 const { authUser, allUser } = require('./controllers/userController');
-const { getRooms } = require('./controllers/roomController');
+const { getRooms, createRoom } = require('./controllers/roomController');
 const PORT = process.env.PORT || 5000;
 
 const server = http.createServer((req, res) => {
@@ -36,14 +36,16 @@ const server = http.createServer((req, res) => {
         }
 
     } else if (method == 'post') {
-        var body = "";
         switch (path) {
             case '/api/create-user':
-                res.setHeader("Content-Type", "application/json");
-                res.setHeader("Access-Control-Allow-Origin", "*");
-                res.writeHead(200);
-                res.write(JSON.stringify({ message: 'Create New User' }));
-                res.end();
+                authUser(req, res);
+                // console.log('Body: ' + body)
+
+                // res.setHeader("Content-Type", "application/json");
+                // res.setHeader("Access-Control-Allow-Origin", "*");
+                // res.writeHead(200);
+                // res.write(JSON.stringify({ message: 'Create New User' }));
+                // res.end();
                 break;
             case '/api/login-user':
                 authUser(req, res);
@@ -56,11 +58,8 @@ const server = http.createServer((req, res) => {
                 res.end();
                 break;
             case '/api/create-room':
-                res.setHeader("Content-Type", "application/json");
-                res.setHeader("Access-Control-Allow-Origin", "*");
-                res.writeHead(200);
-                res.write(JSON.stringify({ message: 'Logout User' }));
-                res.end();
+                console.log("yes")
+                createRoom(req, res);
                 break;
             default:
                 res.setHeader("Content-Type", "application/json");

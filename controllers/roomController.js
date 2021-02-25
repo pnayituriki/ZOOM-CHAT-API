@@ -1,4 +1,5 @@
 const Room = require('../models/roomModel');
+const { randomid } = require('../helpers/functions');
 
 const getRooms = async (req, res, user_id) => {
     try {
@@ -17,4 +18,43 @@ const getRooms = async (req, res, user_id) => {
     }
 }
 
-module.exports = { getRooms };
+const createRoom = async (req, res) => {
+    let body = [];
+    try {
+        const userId = req.headers['authorization'].split('Bearer ')[1];
+        console.log("header..", userId);
+        const roomId = randomid();
+
+        const result = await Room.addRoom(userId, roomId);
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify({
+            message: 'Room Created Successful',
+            data: result
+        }));
+        res.end();
+
+        // req.on('error', (err) => {
+        //     console.error(err);
+        // }).on('data', async function (data) {
+        //     await body.push(data);
+        // }).on('end', async function () {
+        //     body = await Buffer.concat(body).toString();
+        //     body = JSON.parse(body);
+        //     res.on('error', (err) => {
+        //         console.error(err);
+        //     });
+
+
+        // });
+    } catch (error) {
+        console.error(error);
+        res.end();
+    }
+}
+
+module.exports = {
+    createRoom,
+    getRooms
+};

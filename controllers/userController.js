@@ -1,24 +1,33 @@
 const User = require('../models/userModel');
 
 const authUser = async (req, res) => {
-    let body = "";
+    let body = [];
     try {
-        req.on('data', function (data) {
-            body += data
-            console.log('Partial body: ' + body)
-        })
-        req.on('end', function () {
-            console.log('Body: ' + body)
+        req.on('error', (err) => {
+            console.error(err);
+        }).on('data', async function (data) {
+            await body.push(data);
+        }).on('end', async function () {
+            body = await Buffer.concat(body).toString();
+            body = JSON.parse(body);
+            res.on('error', (err) => {
+                console.error(err);
+            });
+
+
+            const result = await User.loginUser(body.username, body.password);
+
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
             res.write(JSON.stringify({
-                message: 'Route for user Login Post',
-                data: body
+                message: 'User Authentication',
+                data: result
             }));
             res.end();
-
-        })
-
+        });
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.end();
     }
 }
 

@@ -1,8 +1,23 @@
 const pool = require('../config/database');
 
-const loginUser = () => {
+const loginUser = (username, password) => {
     return new Promise((resolve, reject) => {
-        resolve({ message: 'user login' })
+        const sql = `SELECT * FROM tbl_user WHERE user_email = '${username}' AND user_password = '${password}'`;
+        pool
+            .query(sql)
+            .then((res) => {
+                console.log('id')
+                const data = {
+                    data: res.rows,
+                    token: res.rows[0].user_id,
+                    rowCount: res.rowCount
+                }
+                resolve(data);
+            })
+            .catch((err) => {
+                console.log(err)
+                reject(err);
+            });
     })
 }
 
