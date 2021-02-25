@@ -1,20 +1,24 @@
 const pool = require('../config/database');
 
-
-const readMyRooms = (user_id) => {
+const loginUser = () => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM tbl_rooms WHERE user_id = ${user_id}`;
+        resolve({ message: 'user login' })
+    })
+}
+
+const query = (text) => {
+    return new Promise((resolve, reject) => {
         pool
-            .query(sql)
+            .query(text)
             .then((res) => {
                 const data = { rows: res.rows, rowCount: res.rowCount }
                 resolve(data);
             })
             .catch((err) => {
-                console.log(err)
+                console.log(err);
                 reject(err);
             });
-    })
+    });
 }
 
-module.exports = { readMyRooms };
+module.exports = { loginUser, query };

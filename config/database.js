@@ -1,12 +1,13 @@
-const config = require('config');
+const { Client } = require('pg');
+const config = require('./default.json');
 
 const Pool = require('pg').Pool
 const pool = new Pool({
-    user: config.get('user'),
-    host: config.get('host'),
-    database: config.get('database'),
-    password: config.get('password'),
-    port: config.get('port'),
-})
+    user: config.user,
+    host: config.host,
+    database: config.database,
+    password: config.password,
+    port: config.port
+});
 
 module.exports = pool;
